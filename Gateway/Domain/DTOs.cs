@@ -1,4 +1,4 @@
-namespace Gateway.Application;
+namespace Gateway.Domain;
 
 public record WeatherDto
 (

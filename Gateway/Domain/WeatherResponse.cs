@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Gateway.Infrastructure;
+namespace Gateway.Domain;
 
 public class WeatherResponse
 {

@@ -1,8 +1,11 @@
 using Gateway.Application;
+using Gateway.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddHttpClient<GatewayService>();
+builder.Services.AddHttpClient<GeoCodeService>();
+builder.Services.AddHttpClient<WeatherService>();
+builder.Services.AddScoped<GatewayService>();
 
 var app = builder.Build();
 
