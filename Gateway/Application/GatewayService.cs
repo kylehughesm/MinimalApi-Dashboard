@@ -16,23 +16,32 @@ public class GatewayService
     }
     public async Task<Result<WeatherDto>> Get()
     {
-        //pass geocode service parameters to get lat and long
 
         var geoResponse = await _geoCodeService.GetLocation();
-
-        //pass Weather service parameters to fetch weather
-
         var weatherResponse = await _weatherService.GetWeather(geoResponse.Lat, geoResponse.Lon);
-        
 
-        var dto = new WeatherDto(
-                geoResponse.Name,
+        var current = new CurrentWeather(
+                DateTime.Parse(weatherResponse.Current.Time),
                 weatherResponse.Current.Temperature2m,
-                weatherResponse.Current.WeatherCode,
+                WeatherCodeLookup.GetDescription(weatherResponse.Current.WeatherCode),
                 weatherResponse.Current.Precipitation
-            );
+                );
 
-        //return Result object with weather 
+        var forecast = new List<DailyForecast>();
+
+        for (int i = 0; i < weatherResponse.Daily.Time.Count; i++)
+        {
+            forecast.Add(new DailyForecast(
+                        DateTime.Parse(weatherResponse.Daily.Time[i]), 
+                        WeatherCodeLookup.GetDescription(weatherResponse.Daily.WeatherCode[i]), 
+                        weatherResponse.Daily.TemperatureMax[i], 
+                        weatherResponse.Daily.TemperatureMin[i], 
+                        weatherResponse.Daily.PrecipitationSum[i]
+                        ));
+        }
+
+        var dto = new WeatherDto(geoResponse.Name, current, forecast);
+
         return Result<WeatherDto>.Ok(dto);
     }
 }

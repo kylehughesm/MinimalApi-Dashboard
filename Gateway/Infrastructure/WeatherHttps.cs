@@ -11,7 +11,6 @@ public class WeatherService
         _httpClient = httpClient;
     }
 
-
     public async Task<WeatherResponse> GetWeather(double latitude,double longitude)
     {
 

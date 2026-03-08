@@ -11,14 +11,17 @@ public class WeatherResponse
     public double Longitude { get; set; }
 
     [JsonPropertyName("current")]
-    public CurrentWeather Current { get; set; } = new();
+    public Current Current { get; set; } = new();
 
     [JsonPropertyName("daily")]
     public DailyWeather Daily { get; set; } = new();
 }
 
-public class CurrentWeather
+public class Current
 {
+    [JsonPropertyName("time")]
+    public string Time { get; set; } = "";
+
     [JsonPropertyName("temperature_2m")]
     public decimal Temperature2m { get; set; }
 
@@ -27,9 +30,6 @@ public class CurrentWeather
 
     [JsonPropertyName("precipitation")]
     public decimal Precipitation { get; set; }
-
-    [JsonPropertyName("time")]
-    public string Time { get; set; } = "";
 }
 
 public class DailyWeather
@@ -37,12 +37,15 @@ public class DailyWeather
     [JsonPropertyName("time")]
     public List<string> Time { get; set; } = new();
 
+    [JsonPropertyName("weather_code")]
+    public List<int> WeatherCode { get; set; } = new();
+
     [JsonPropertyName("temperature_2m_max")]
     public List<decimal> TemperatureMax { get; set; } = new();
 
     [JsonPropertyName("temperature_2m_min")]
     public List<decimal> TemperatureMin { get; set; } = new();
 
-    [JsonPropertyName("weather_code")]
-    public List<int> WeatherCode { get; set; } = new();
+    [JsonPropertyName("precipitation_sum")]
+    public List<decimal> PrecipitationSum {get; set; } = new();
 }

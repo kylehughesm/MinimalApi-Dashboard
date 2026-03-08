@@ -2,10 +2,26 @@ namespace Gateway.Domain;
 
 public record WeatherDto
 (
-    string Location,
-    decimal Temperature,
-    int WeatherCode,
-    decimal Precipitation
+    string Name,
+    CurrentWeather Current,
+    List<DailyForecast> Forecast
+);
+
+public record CurrentWeather
+(
+    DateTime Time,
+    decimal Temp,
+    string Description,
+    decimal PrecipitationSum
+);
+
+public record DailyForecast
+(
+    DateTime Day,
+    string Description, 
+    decimal MaxTemp,
+    decimal MinTemp,
+    decimal PrecipitationSum
 );
 
 public sealed class Result<T>
