@@ -1,0 +1,16 @@
+@using Dashboard.Models
+
+@if (Forecast is not null)
+{
+    <div class="forecast-card">
+        <h4>@Forecast.Day.ToString("ddd")</h4>
+        <p>@Forecast.Description</p>
+        <p>High: @Math.Round(Forecast.MaxTemp)°F</p>
+        <p>Low: @Math.Round(Forecast.MinTemp)°F</p>
+        <p>Precip: @Forecast.PrecipitationSum</p>
+    </div>
+}
+
+@code {
+    [Parameter] public DailyForecastDto? Forecast { get; set; }
+}

@@ -1,0 +1,48 @@
+﻿@page "/weather"
+@using Dashboard.Models
+@using Dashboard.Components
+@inject HttpClient Http
+
+<PageTitle>Weather</PageTitle>
+
+@if (weather is null)
+{
+    <p>Loading...</p>
+}
+else if (!weather.Success || weather.Value is null || weather.Value.Current is null)
+{
+    <p>Weather data could not be loaded.</p>
+
+    @if (!string.IsNullOrWhiteSpace(weather.Error))
+    {
+        <p>Error: @weather.Error</p>
+    }
+}
+else
+{
+    <h3 class="page-title">@weather.Value.Name Weather</h3>
+
+    <div class="weather-page">
+        <div class="current-weather-wrapper">
+            <CurrentWeatherPanel
+                LocationName="@weather.Value.Name"
+                Current="@weather.Value.Current" />
+        </div>
+
+        <div class="forecast-row">
+            @foreach (var item in weather.Value.Forecast)
+            {
+                <ForecastCard Forecast="@item" />
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private WeatherResponseDto? weather;
+
+    protected override async Task OnInitializedAsync()
+    {
+        weather = await Http.GetFromJsonAsync<WeatherResponseDto>("/");
+    }
+}
