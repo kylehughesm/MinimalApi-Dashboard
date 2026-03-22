@@ -36,12 +36,3 @@ public sealed class Result<T>
     public static Result<T> Ok(T value) => new(true, value, null);
     public static Result<T> Fail(string error) => new(false, default, error);
 }
-
-public class GeoCodeResponse
-{
-    public string Zip { get; set; }
-    public string Name { get; set; }
-    public double Lat { get; set; }
-    public double Lon { get; set; }
-    public string Country { get; set; }
-}

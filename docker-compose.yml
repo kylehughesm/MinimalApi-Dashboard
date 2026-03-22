@@ -7,4 +7,16 @@ services:
       - "7057:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      WeatherService__BaseUrl: http://weather:8080
+    depends_on:
+      - weather
+
+  weather:
+    build:
+      context: ./Weather
+      dockerfile: Dockerfile
+    ports:
+      - "7058:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
       GeoCode__ApiKey: ${GEOCODE_API_KEY}

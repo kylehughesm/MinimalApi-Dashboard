@@ -1,4 +1,4 @@
-namespace Gateway.Application;
+namespace Weather.Application;
 
 public static class WeatherCodeLookup
 {
@@ -39,3 +39,4 @@ public static class WeatherCodeLookup
         return Codes[code];
     }
 }
+

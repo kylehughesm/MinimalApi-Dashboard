@@ -14,8 +14,11 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddHttpClient<GeoCodeService>();
-builder.Services.AddHttpClient<WeatherService>();
+builder.Services.AddHttpClient<WeatherService>(client => 
+{
+    client.BaseAddress = new Uri("http://weather:8080");
+});
+
 builder.Services.AddScoped<GatewayService>();
 
 var app = builder.Build();
