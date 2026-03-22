@@ -4,11 +4,11 @@ using Gateway.Domain;
 
 namespace Gateway.Application;
 
-public class GatewayService
+public class GatewayService: IGatewayService
 {
-    private readonly WeatherService _weatherService;
+    private readonly IWeatherService _weatherService;
 
-    public GatewayService(WeatherService weatherService)
+    public GatewayService(IWeatherService weatherService)
     {
         _weatherService = weatherService;
     }

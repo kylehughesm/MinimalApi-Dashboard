@@ -2,7 +2,7 @@ using Weather.Domain;
 
 namespace Weather.Infrastructure;
 
-public class GeoCodeClient
+public class GeoCodeClient: IGeoClient
 {
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _config;

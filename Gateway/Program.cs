@@ -14,17 +14,17 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddHttpClient<WeatherService>(client => 
+builder.Services.AddHttpClient<IWeatherService, WeatherService>(client => 
 {
     client.BaseAddress = new Uri("http://weather:8080");
 });
 
-builder.Services.AddScoped<GatewayService>();
+builder.Services.AddScoped<IGatewayService, GatewayService>();
 
 var app = builder.Build();
 
 app.UseCors("blazor");
 
-app.MapGet("/", async (GatewayService service) => await service.Get());
+app.MapGet("/", async (IGatewayService service) => await service.Get());
 
 app.Run();

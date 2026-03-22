@@ -1,8 +1,9 @@
 using Gateway.Domain;
+using Gateway.Infrastructure;
 
 namespace Gateway.Infrastructure;
 
-public class WeatherService
+public class WeatherService: IWeatherService
 {
     private readonly HttpClient _httpClient;
     

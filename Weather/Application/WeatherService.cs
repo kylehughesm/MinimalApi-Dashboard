@@ -4,12 +4,12 @@ using Weather.Domain;
 
 namespace Weather.Application;
 
-public class WeatherService
+public class WeatherService: IWeatherService
 {
-    private readonly GeoCodeClient _geoCodeClient;
-    private readonly WeatherClient _weatherClient;
+    private readonly IGeoClient _geoCodeClient;
+    private readonly IWeatherClient _weatherClient;
 
-    public WeatherService(GeoCodeClient geoCodeClient, WeatherClient weatherClient)
+    public WeatherService(IGeoClient geoCodeClient, IWeatherClient weatherClient)
     {
         _geoCodeClient = geoCodeClient;
         _weatherClient = weatherClient;
@@ -18,7 +18,14 @@ public class WeatherService
     {
 
         var geoResponse = await _geoCodeClient.GetLocation();
+
+        if (geoResponse is null)
+            return Result<WeatherDto>.Fail("Failed to get location.");
+
         var weatherResponse = await _weatherClient.GetWeather(geoResponse.Lat, geoResponse.Lon);
+
+        if (weatherResponse is null)
+            return Result<WeatherDto>.Fail("Failed to get weather.");
 
         var current = new CurrentWeather(
                 DateTime.Parse(weatherResponse.Current.Time),
