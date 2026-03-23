@@ -13,14 +13,11 @@ public class GeoCodeClient: IGeoClient
         _config = config;
     }
 
-    public async Task<GeoCodeResponse> GetLocation()
+    public async Task<GeoCodeResponse> GetLocation(string zip, string countryCode)
     {
         var apiKey = _config["GeoCode:ApiKey"];
-        var zipCode = "47546";
 
-        var countryCode = "US";
-
-        var geoUrl = $"https://api.openweathermap.org/geo/1.0/zip?zip={zipCode},{countryCode}&appid={apiKey}";
+        var geoUrl = $"https://api.openweathermap.org/geo/1.0/zip?zip={zip},{countryCode}&appid={apiKey}";
 
         var response = await _httpClient.GetAsync(geoUrl);
 

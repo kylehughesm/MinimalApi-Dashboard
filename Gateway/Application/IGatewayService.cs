@@ -4,5 +4,5 @@ namespace Gateway.Application;
 
 public interface IGatewayService
 {
-    public Task<Result<WeatherDto>> Get();
+    public Task<Result<WeatherDto>> Get(string zip, string countryCode);
 }

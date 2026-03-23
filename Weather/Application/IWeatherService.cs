@@ -4,5 +4,5 @@ namespace Weather.Application;
 
 public interface IWeatherService
 {
-    public Task<Result<WeatherDto>> Get();
+    public Task<Result<WeatherDto>> Get(string zip, string countryCode);
 }

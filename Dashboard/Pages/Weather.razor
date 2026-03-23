@@ -5,9 +5,21 @@
 
 <PageTitle>Weather</PageTitle>
 
+<div>
+    <label>Zip Code:</label>
+    <input @bind="zip" />
+</div>
+
+<div>
+    <label>Country Code:</label>
+    <input @bind="countryCode" />
+</div>
+
+<button @onclick="LoadWeather">Search</button>
+
 @if (weather is null)
 {
-    <p>Loading...</p>
+    <p>No weather loaded.</p>
 }
 else if (!weather.Success || weather.Value is null || weather.Value.Current is null)
 {
@@ -40,9 +52,12 @@ else
 
 @code {
     private WeatherResponseDto? weather;
+    private string zip = "47546";
+    private string countryCode = "US";
 
-    protected override async Task OnInitializedAsync()
+    private async Task LoadWeather()
     {
-        weather = await Http.GetFromJsonAsync<WeatherResponseDto>("/");
+        weather = await Http.GetFromJsonAsync<WeatherResponseDto>(
+            $"/?zip={Uri.EscapeDataString(zip)}&countryCode={Uri.EscapeDataString(countryCode)}");
     }
 }

@@ -25,6 +25,6 @@ var app = builder.Build();
 
 app.UseCors("blazor");
 
-app.MapGet("/", async (IGatewayService service) => await service.Get());
+app.MapGet("/", async (string zip, string countryCode, IGatewayService service) => await service.Get(zip, countryCode));
 
 app.Run();

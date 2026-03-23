@@ -14,10 +14,10 @@ public class WeatherService: IWeatherService
         _geoCodeClient = geoCodeClient;
         _weatherClient = weatherClient;
     }
-    public async Task<Result<WeatherDto>> Get()
+    public async Task<Result<WeatherDto>> Get(string zip, string countryCode)
     {
 
-        var geoResponse = await _geoCodeClient.GetLocation();
+        var geoResponse = await _geoCodeClient.GetLocation(zip, countryCode);
 
         if (geoResponse is null)
             return Result<WeatherDto>.Fail("Failed to get location.");

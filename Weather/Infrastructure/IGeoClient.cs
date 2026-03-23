@@ -4,5 +4,5 @@ namespace Weather.Infrastructure;
 
 public interface IGeoClient
 {
-    public Task<GeoCodeResponse> GetLocation();
+    public Task<GeoCodeResponse> GetLocation(string zip, string countyrCode);
 }

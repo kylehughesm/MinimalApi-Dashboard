@@ -12,9 +12,9 @@ public class GatewayService: IGatewayService
     {
         _weatherService = weatherService;
     }
-    public async Task<Result<WeatherDto>> Get()
+    public async Task<Result<WeatherDto>> Get(string zip, string countryCode)
     {
-        var response = await _weatherService.GetWeather();
+        var response = await _weatherService.GetWeather(zip, countryCode);
 
         return Result<WeatherDto>.Ok(response);
     }
