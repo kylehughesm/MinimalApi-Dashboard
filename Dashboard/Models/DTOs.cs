@@ -30,3 +30,9 @@ public class DailyForecastDto
     public double MinTemp { get; set; }
     public double PrecipitationSum { get; set; }
 }
+
+public class CountryOption
+{
+    public string Code { get; set; } = "";
+    public string Name { get; set; } = "";
+}
