@@ -26,13 +26,21 @@ public record DailyForecast
 
 public sealed class Result<T>
 {
-    public bool Success { get; }
-    public string Error { get; }
-    public T Value { get; }
+    public bool Success { get; set; }
+    public string? Error { get; set; }
+    public T? Value { get; set; }
 
-    private Result(bool success, T value, string error)
-        => (Success, Value, Error) = (success, value, error);
+    public static Result<T> Ok(T value) => new()
+    {
+        Success = true,
+        Value = value,
+        Error = null
+    };
 
-    public static Result<T> Ok(T value) => new(true, value, null);
-    public static Result<T> Fail(string error) => new(false, default, error);
+    public static Result<T> Fail(string error) => new()
+    {
+        Success = false,
+        Value = default,
+        Error = error
+    };
 }

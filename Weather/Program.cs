@@ -14,9 +14,9 @@ app.MapGet("/", async (string zip, string countryCode, IWeatherService service) 
     var result = await service.Get(zip, countryCode);
 
     if (!result.Success || result.Value is null)
-        return Results.Problem("Weather service failed.");
+        return Results.BadRequest(result);
     
-    return Results.Ok(result.Value);
+    return Results.Ok(result);
 });     
 
 app.Run();

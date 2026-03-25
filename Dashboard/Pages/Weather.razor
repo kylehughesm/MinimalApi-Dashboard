@@ -24,6 +24,11 @@
 
 <button @onclick="LoadWeather">Search</button>
 
+@if (!string.IsNullOrWhiteSpace(validationError))
+{
+    <p style="color:red">@validationError</p>
+}
+
 @if (weather is null)
 {
     <p>No weather loaded.</p>
@@ -64,6 +69,8 @@ else
 
     private List<CountryOption> countries = new();
 
+    private string? validationError;
+
     protected override async Task OnInitializedAsync()
     {
         countries = await Http.GetFromJsonAsync<List<CountryOption>>("data/countries.json")
@@ -72,10 +79,31 @@ else
 
     private async Task LoadWeather()
     {
-        if (string.IsNullOrWhiteSpace(zip) || string.IsNullOrWhiteSpace(countryCode))
+        if (!IsValidInput())
             return;
 
         weather = await ApiClient.Http.GetFromJsonAsync<WeatherResponseDto>(
             $"/?zip={Uri.EscapeDataString(zip)}&countryCode={Uri.EscapeDataString(countryCode)}");
+    }
+
+    private bool IsValidInput()
+    {
+        zip = zip.Trim();
+        countryCode = countryCode.Trim();
+
+        if (string.IsNullOrWhiteSpace(zip))
+        {
+            validationError = "Zip code is required.";
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(countryCode))
+        {
+            validationError = "Please select a country.";
+            return false;
+        }
+
+        validationError = null;
+        return true;
     }
 }

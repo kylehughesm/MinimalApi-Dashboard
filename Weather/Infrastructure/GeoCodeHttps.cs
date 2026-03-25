@@ -22,7 +22,7 @@ public class GeoCodeClient: IGeoClient
         var response = await _httpClient.GetAsync(geoUrl);
 
         if (!response.IsSuccessStatusCode)
-            throw new Exception("GeoCode API failed.");
+            return null;
 
         var result =  await response.Content.ReadFromJsonAsync<GeoCodeResponse>();
 

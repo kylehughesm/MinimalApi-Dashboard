@@ -12,14 +12,27 @@ public class WeatherService: IWeatherService
         _httpClient = httpClient;
     }
 
-    public async Task<WeatherDto> GetWeather(string zip, string countryCode)
+    public async Task<Result<WeatherDto>> GetWeather(string zip, string countryCode)
     {
-        var response = await _httpClient.GetFromJsonAsync<WeatherDto>(
-        $"/?zip={Uri.EscapeDataString(zip)}&countryCode={Uri.EscapeDataString(countryCode)}");
+        try
+        {
+            var response = await _httpClient.GetAsync(
+                $"?zip={Uri.EscapeDataString(zip)}&countryCode={Uri.EscapeDataString(countryCode)}");
 
-        if (response is null)
-            throw new Exception("Weather response was null.");
+            var result = await response.Content.ReadFromJsonAsync<Result<WeatherDto>>();
 
-        return response; 
+            if (result is not null)
+                return result;
+
+            if (!response.IsSuccessStatusCode)
+                return Result<WeatherDto>.Fail("Weather service unavailable");
+
+            return Result<WeatherDto>.Fail("Invalid response from weather service");
+        }
+        catch
+        {
+            return Result<WeatherDto>.Fail("Weather service unreachable");
+        }
     }
 }
+

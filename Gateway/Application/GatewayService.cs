@@ -16,6 +16,6 @@ public class GatewayService: IGatewayService
     {
         var response = await _weatherService.GetWeather(zip, countryCode);
 
-        return Result<WeatherDto>.Ok(response);
+        return response;
     }
 }
