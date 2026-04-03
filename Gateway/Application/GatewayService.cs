@@ -7,15 +7,26 @@ namespace Gateway.Application;
 public class GatewayService: IGatewayService
 {
     private readonly IWeatherService _weatherService;
+    private readonly INewsService _newsService;
 
-    public GatewayService(IWeatherService weatherService)
+    public GatewayService(IWeatherService weatherService, INewsService newsService)
     {
         _weatherService = weatherService;
+        _newsService =  newsService;
     }
-    public async Task<Result<WeatherDto>> Get(string zip, string countryCode)
+    public async Task<Result<DashboardDto>> Get(string zip, string countryCode)
     {
-        var response = await _weatherService.GetWeather(zip, countryCode);
+        var weather = await _weatherService.GetWeather(zip, countryCode);
+        var news = await _newsService.GetNews(countryCode);
 
-        return response;
+        var result = new DashboardDto
+        {
+            Weather = weather.Value,
+            WeatherError = weather.Error,
+            News = news.Value,
+            NewsError = news.Error
+        };
+
+        return Result<DashboardDto>.Ok(result);
     }
 }

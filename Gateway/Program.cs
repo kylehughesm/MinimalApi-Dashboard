@@ -19,6 +19,11 @@ builder.Services.AddHttpClient<IWeatherService, WeatherService>(client =>
     client.BaseAddress = new Uri("http://weather:8080");
 });
 
+builder.Services.AddHttpClient<INewsService, NewsService>(client =>
+{
+    client.BaseAddress = new Uri("http://news:8080");
+});
+
 builder.Services.AddScoped<IGatewayService, GatewayService>();
 
 var app = builder.Build();

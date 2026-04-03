@@ -1,13 +1,30 @@
 namespace Dashboard.Models;
 
-public class WeatherResponseDto
+public class Result<T> 
 {
     public bool Success { get; set; }
     public string? Error { get; set; }
-    public WeatherValueDto? Value { get; set; }
+    public T? Value { get; set; }
 }
 
-public class WeatherValueDto
+public class DashboardDto
+{
+    public WeatherDto? Weather { get; set; }
+    public string? WeatherError { get; set; }
+    public List<NewsArticleDto>? News { get; set; }
+    public string? NewsError { get; set; }
+}
+
+public class NewsArticleDto
+{
+    public string Title { get; set; } = "";
+    public string? Summary { get; set; }
+    public string Url { get; set; } = "";
+    public string Source { get; set; } = "";
+    public DateTime PublishedAt { get; set; }
+}
+
+public class WeatherDto
 {
     public string Name { get; set; } = "";
     public CurrentWeatherDto? Current { get; set; }

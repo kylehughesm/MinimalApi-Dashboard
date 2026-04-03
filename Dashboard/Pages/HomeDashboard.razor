@@ -1,10 +1,10 @@
-﻿@page "/weather"
+﻿@page "/dashboard"
 @using Dashboard.Models
 @using Dashboard.Components
 @inject HttpClient Http
 @inject ApiClient ApiClient
 
-<PageTitle>Weather</PageTitle>
+<PageTitle>Dashboard</PageTitle>
 
 <div>
     <label>Zip Code:</label>
@@ -29,46 +29,57 @@
     <p style="color:red">@validationError</p>
 }
 
-@if (weather is null)
+@if (dashboard is null)
 {
-    <p>No weather loaded.</p>
+    <p>No data loaded.</p>
 }
-else if (!weather.Success || weather.Value is null || weather.Value.Current is null)
+else if (!dashboard.Success || dashboard.Value is null)
 {
-    <p>Weather data could not be loaded.</p>
+    <p>Dashboard data could not be loaded.</p>
 
-    @if (!string.IsNullOrWhiteSpace(weather.Error))
+    @if (!string.IsNullOrWhiteSpace(dashboard.Error))
     {
-        <p>Error: @weather.Error</p>
+        <p>Error: @dashboard.Error</p>
     }
 }
 else
 {
-    <h3 class="page-title">@weather.Value.Name Weather</h3>
+    @if (dashboard.Value.Weather is not null)
+    {
+        <h3 class="page-title">@dashboard.Value.Weather.Name Weather</h3>
 
-    <div class="weather-page">
-        <div class="current-weather-wrapper">
-            <CurrentWeatherPanel
-                LocationName="@weather.Value.Name"
-                Current="@weather.Value.Current" />
-        </div>
+        <div class="weather-page">
+            <div class="current-weather-wrapper">
+                <CurrentWeatherPanel
+                    LocationName="@dashboard.Value.Weather.Name"
+                    Current="@dashboard.Value.Weather.Current" />
+            </div>
 
-        <div class="forecast-row">
-            @foreach (var item in weather.Value.Forecast)
-            {
-                <ForecastCard Forecast="@item" />
-            }
+            <div class="forecast-row">
+                @foreach (var item in dashboard.Value.Weather.Forecast)
+                {
+                    <ForecastCard Forecast="@item" />
+                }
+            </div>
         </div>
-    </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(dashboard.Value.WeatherError))
+    {
+        <p style="color:red">Weather error: @dashboard.Value.WeatherError</p>
+    }
+
+    <hr/>
+
+    <NewsPanel Articles= "@(dashboard.Value.News)" Error= "@(dashboard.Value.NewsError)"/>
+
 }
 
 @code {
-    private WeatherResponseDto? weather;
+    private Result<DashboardDto>? dashboard;
     private string zip = "47546";
     private string countryCode = "US";
 
     private List<CountryOption> countries = new();
-
     private string? validationError;
 
     protected override async Task OnInitializedAsync()
@@ -82,7 +93,7 @@ else
         if (!IsValidInput())
             return;
 
-        weather = await ApiClient.Http.GetFromJsonAsync<WeatherResponseDto>(
+        dashboard = await ApiClient.Http.GetFromJsonAsync<Result<DashboardDto>>(
             $"/?zip={Uri.EscapeDataString(zip)}&countryCode={Uri.EscapeDataString(countryCode)}");
     }
 

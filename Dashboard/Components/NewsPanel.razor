@@ -1,0 +1,39 @@
+@using Dashboard.Models
+
+<div class="news-panel">
+    <h3>News</h3>
+
+    @if (!string.IsNullOrWhiteSpace(Error))
+    {
+        <p style="color:red">News error: @Error</p>
+    }
+    else if (Articles is null || !Articles.Any())
+    {
+        <p>No news available.</p>
+    }
+    else
+    {
+        @foreach (var article in Articles)
+        {
+            <div class="news-item" style="margin-bottom:1rem;">
+                <a href="@article.Url" target="_blank">@article.Title</a>
+                <div>
+                    <strong>@article.Source</strong> - @article.PublishedAt.ToLocalTime()
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(article.Summary))
+                {
+                    <div>@article.Summary</div>
+                }
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<NewsArticleDto>? Articles { get; set; }
+
+    [Parameter]
+    public string? Error { get; set; }
+}

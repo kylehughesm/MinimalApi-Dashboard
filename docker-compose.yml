@@ -20,3 +20,13 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       GeoCode__ApiKey: ${GEOCODE_API_KEY}
+
+  news:
+    build:
+      context: ./News
+      dockerfile: Dockerfile
+    ports:
+      - "7059:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      NewsApi__ApiKey: ${NEWSAPI_API_KEY}
