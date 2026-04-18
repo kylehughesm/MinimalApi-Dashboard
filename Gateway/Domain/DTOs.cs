@@ -69,3 +69,5 @@ public class NewsArticleDto
     public string Source { get; set; } = "";
     public DateTime PublishedAt { get; set; }
 }
+
+public record UpdatePreferencesRequest(string Zip, string CountryCode);

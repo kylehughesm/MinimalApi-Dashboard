@@ -11,3 +11,8 @@ public interface INewsService
 {
     public Task<Result<List<NewsArticleDto>>> GetNews(string countryCode);
 }
+
+public interface IUserPreferenceService
+{
+    Task<UserPreference?> GetByUserIdAsync(string userId);
+}

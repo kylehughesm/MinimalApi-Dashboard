@@ -1,5 +1,9 @@
+using System.Security.Claims;
 using Gateway.Application;
+using Gateway.Domain;
 using Gateway.Infrastructure;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,14 +11,22 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("blazor", policy =>
     {
-        policy
-            .WithOrigins("http://localhost:5098")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+        policy.WithOrigins("http://localhost:5098")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
-builder.Services.AddHttpClient<IWeatherService, WeatherService>(client => 
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddHttpClient<IWeatherService, WeatherService>(client =>
 {
     client.BaseAddress = new Uri("http://weather:8080");
 });
@@ -30,6 +42,84 @@ var app = builder.Build();
 
 app.UseCors("blazor");
 
-app.MapGet("/", async (string zip, string countryCode, IGatewayService service) => await service.Get(zip, countryCode));
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapIdentityApi<ApplicationUser>();
+
+app.MapGet("/", async (string zip, string countryCode, IGatewayService service) =>
+    await service.Get(zip, countryCode));
+
+app.MapGet("/me", (ClaimsPrincipal user) =>
+{
+    var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    var email = user.FindFirstValue(ClaimTypes.Email);
+
+    return TypedResults.Ok(new
+    {
+        userId,
+        email
+    });
+}).RequireAuthorization();
+
+app.MapGet("/preferences", async (ClaimsPrincipal user, ApplicationDbContext db) =>
+{
+    var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+
+    if (userId is null)
+        return Results.Unauthorized();
+
+    var prefs = await db.UserPreferences
+        .AsNoTracking()
+        .FirstOrDefaultAsync(x => x.UserId == userId);
+
+    if (prefs is null)
+        return Results.Ok(new { zip = "", countryCode = "US" });
+
+    return Results.Ok(new
+    {
+        zip = prefs.Zip,
+        countryCode = prefs.CountryCode
+    });
+}).RequireAuthorization();
+
+app.MapPut("/preferences", async (
+    UpdatePreferencesRequest request,
+    ClaimsPrincipal user,
+    ApplicationDbContext db) =>
+{
+    var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+
+    if (userId is null)
+        return Results.Unauthorized();
+
+    var prefs = await db.UserPreferences
+        .FirstOrDefaultAsync(x => x.UserId == userId);
+
+    if (prefs is null)
+    {
+        prefs = new UserPreference
+        {
+            UserId = userId,
+            Zip = request.Zip,
+            CountryCode = request.CountryCode
+        };
+
+        db.UserPreferences.Add(prefs);
+    }
+    else
+    {
+        prefs.Zip = request.Zip;
+        prefs.CountryCode = request.CountryCode;
+    }
+
+    await db.SaveChangesAsync();
+
+    return Results.Ok(new
+    {
+        zip = prefs.Zip,
+        countryCode = prefs.CountryCode
+    });
+}).RequireAuthorization();
 
 app.Run();

@@ -7,6 +7,7 @@ services:
       - "7057:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: ${NEON_CONNECTION_STRING}
       WeatherService__BaseUrl: http://weather:8080
     depends_on:
       - weather
