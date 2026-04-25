@@ -5,6 +5,7 @@ using Gateway.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +53,16 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapIdentityApi<ApplicationUser>();
+
+app.MapPost("/logout", async (HttpContext context) =>
+{
+    await context.SignOutAsync(IdentityConstants.ApplicationScheme);
+    return Results.Ok();
+})
+.WithSummary("Logs out the user")
+.WithDescription("Clears the authentication cookie")
+.WithTags("Identity")
+.RequireAuthorization(cookieAuth);
 
 app.MapGet("/", async (string zip, string countryCode, IGatewayService service) =>
     await service.Get(zip, countryCode));

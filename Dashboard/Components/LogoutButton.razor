@@ -1,0 +1,47 @@
+@inject ApiClient ApiClient
+@inject NavigationManager Navigation
+
+<button @onclick="Logout" disabled="@isLoggingOut">
+    @(isLoggingOut ? "Logging out..." : "Logout")
+</button>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <p style="color:red">@message</p>
+}
+
+@code {
+    private bool isLoggingOut;
+    private string? message;
+
+    private async Task Logout()
+    {
+        if (isLoggingOut)
+            return;
+
+        isLoggingOut = true;
+        message = null;
+
+        try
+        {
+            var response = await ApiClient.Http.PostAsync("/logout", content: null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Navigation.NavigateTo("/login", forceLoad: true);
+                return;
+            }
+
+            var body = await response.Content.ReadAsStringAsync();
+            message = $"Logout failed: {(int)response.StatusCode} - {body}";
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+        }
+        finally
+        {
+            isLoggingOut = false;
+        }
+    }
+}
