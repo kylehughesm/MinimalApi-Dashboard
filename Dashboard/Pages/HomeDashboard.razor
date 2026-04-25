@@ -22,11 +22,16 @@
     </select>
 </div>
 
-<button @onclick="LoadWeather">Search</button>
+<button @onclick="LoadDashboard">Search</button>
 
 @if (!string.IsNullOrWhiteSpace(validationError))
 {
     <p style="color:red">@validationError</p>
+}
+
+@if (!string.IsNullOrWhiteSpace(authMessage))
+{
+    <p>@authMessage</p>
 }
 
 @if (dashboard is null)
@@ -68,10 +73,9 @@ else
         <p style="color:red">Weather error: @dashboard.Value.WeatherError</p>
     }
 
-    <hr/>
+    <hr />
 
-    <NewsPanel Articles= "@(dashboard.Value.News)" Error= "@(dashboard.Value.NewsError)"/>
-
+    <NewsPanel Articles="@(dashboard.Value.News)" Error="@(dashboard.Value.NewsError)" />
 }
 
 @code {
@@ -81,20 +85,70 @@ else
 
     private List<CountryOption> countries = new();
     private string? validationError;
+    private string? authMessage;
 
     protected override async Task OnInitializedAsync()
     {
         countries = await Http.GetFromJsonAsync<List<CountryOption>>("data/countries.json")
-                    ?? new List<CountryOption>();
+            ?? new List<CountryOption>();
+
+        await LoadSavedPreferences();
     }
 
-    private async Task LoadWeather()
+    private async Task LoadSavedPreferences()
+    {
+        try
+        {
+            var me = await ApiClient.Http.GetFromJsonAsync<MeDto>("/me");
+
+            if (me is null || string.IsNullOrWhiteSpace(me.UserId))
+            {
+                authMessage = "Not logged in.";
+                return;
+            }
+
+            authMessage = $"Logged in as {me.Email}";
+
+            var prefs = await ApiClient.Http.GetFromJsonAsync<PreferencesDto>("/preferences");
+
+            if (prefs is not null)
+            {
+                zip = prefs.Zip;
+                countryCode = prefs.CountryCode;
+            }
+        }
+        catch
+        {
+            authMessage = "Not logged in or saved preferences unavailable.";
+        }
+    }
+
+    private async Task LoadDashboard()
     {
         if (!IsValidInput())
             return;
 
         dashboard = await ApiClient.Http.GetFromJsonAsync<Result<DashboardDto>>(
             $"/?zip={Uri.EscapeDataString(zip)}&countryCode={Uri.EscapeDataString(countryCode)}");
+
+        await SavePreferences();
+    }
+
+    private async Task SavePreferences()
+    {
+        try
+        {
+            var request = new UpdatePreferencesRequest
+            {
+                Zip = zip,
+                CountryCode = countryCode
+            };
+
+            await ApiClient.Http.PutAsJsonAsync("/preferences", request);
+        }
+        catch
+        {
+        }
     }
 
     private bool IsValidInput()
@@ -116,5 +170,23 @@ else
 
         validationError = null;
         return true;
+    }
+
+    public class MeDto
+    {
+        public string UserId { get; set; } = "";
+        public string Email { get; set; } = "";
+    }
+
+    public class PreferencesDto
+    {
+        public string Zip { get; set; } = "";
+        public string CountryCode { get; set; } = "US";
+    }
+
+    public class UpdatePreferencesRequest
+    {
+        public string Zip { get; set; } = "";
+        public string CountryCode { get; set; } = "US";
     }
 }

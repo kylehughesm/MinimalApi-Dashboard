@@ -1,0 +1,62 @@
+@page "/login"
+@inject ApiClient ApiClient
+@inject NavigationManager Navigation
+
+<PageTitle>Login</PageTitle>
+
+<h3>Login</h3>
+
+<div>
+    <label>Email:</label>
+    <input @bind="email" />
+</div>
+
+<div>
+    <label>Password:</label>
+    <input type="password" @bind="password" />
+</div>
+
+<button @onclick="SubmitLogin">Login</button>
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <p>@message</p>
+}
+
+@code {
+    private string email = "";
+    private string password = "";
+    private string? message;
+
+    private async Task SubmitLogin()
+    {
+        try
+        {
+            var response = await ApiClient.Http.PostAsJsonAsync(
+                "/login?useCookies=true",
+                new LoginRequest
+                {
+                    Email = email,
+                    Password = password
+                });
+
+            if (response.IsSuccessStatusCode)
+            {
+                Navigation.NavigateTo("/dashboard", forceLoad: true);
+                return;
+            }
+
+            message = $"Login failed: {(int)response.StatusCode}";
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+        }
+    }
+
+    public class LoginRequest
+    {
+        public string Email { get; set; } = "";
+        public string Password { get; set; } = "";
+    }
+}

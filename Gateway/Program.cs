@@ -4,6 +4,7 @@ using Gateway.Domain;
 using Gateway.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,11 @@ builder.Services.AddScoped<IGatewayService, GatewayService>();
 
 var app = builder.Build();
 
+var cookieAuth = new AuthorizeAttribute
+{
+    AuthenticationSchemes = IdentityConstants.ApplicationScheme
+};
+
 app.UseCors("blazor");
 
 app.UseAuthentication();
@@ -60,7 +66,7 @@ app.MapGet("/me", (ClaimsPrincipal user) =>
         userId,
         email
     });
-}).RequireAuthorization();
+}).RequireAuthorization(cookieAuth);
 
 app.MapGet("/preferences", async (ClaimsPrincipal user, ApplicationDbContext db) =>
 {
@@ -81,7 +87,7 @@ app.MapGet("/preferences", async (ClaimsPrincipal user, ApplicationDbContext db)
         zip = prefs.Zip,
         countryCode = prefs.CountryCode
     });
-}).RequireAuthorization();
+}).RequireAuthorization(cookieAuth);
 
 app.MapPut("/preferences", async (
     UpdatePreferencesRequest request,
@@ -120,6 +126,6 @@ app.MapPut("/preferences", async (
         zip = prefs.Zip,
         countryCode = prefs.CountryCode
     });
-}).RequireAuthorization();
+}).RequireAuthorization(cookieAuth);
 
 app.Run();
