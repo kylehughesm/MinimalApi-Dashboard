@@ -14,9 +14,9 @@ public class GatewayService: IGatewayService
         _weatherService = weatherService;
         _newsService =  newsService;
     }
-    public async Task<Result<DashboardDto>> Get(string zip, string countryCode)
+    public async Task<Result<DashboardDto>> Get(string zip, string countryCode, string temperatureUnit)
     {
-        var weather = await _weatherService.GetWeather(zip, countryCode);
+        var weather = await _weatherService.GetWeather(zip, countryCode, temperatureUnit);
         var news = await _newsService.GetNews(countryCode);
 
         var result = new DashboardDto

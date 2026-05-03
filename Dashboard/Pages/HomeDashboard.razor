@@ -28,6 +28,13 @@
 
 <button @onclick="LoadDashboard">Search</button>
 
+<div>
+    <label style="padding: 10px 10px 10px 0">
+        Fahrenheit
+        <input type="checkbox" @bind="isFahrenheit" @bind:after="LoadDashboard">
+    </label>
+</div>
+
 @if (!string.IsNullOrWhiteSpace(validationError))
 {
     <p style="color:red">@validationError</p>
@@ -61,13 +68,15 @@ else
             <div class="current-weather-wrapper">
                 <CurrentWeatherPanel
                     LocationName="@dashboard.Value.Weather.Name"
-                    Current="@dashboard.Value.Weather.Current" />
+                    Current="@dashboard.Value.Weather.Current"
+                    TemperatureSymbol="@GetTemperatureSymbol()" />
             </div>
 
             <div class="forecast-row">
                 @foreach (var item in dashboard.Value.Weather.Forecast)
                 {
-                    <ForecastCard Forecast="@item" />
+                    <ForecastCard Forecast="@item" 
+                        TemperatureSymbol="@GetTemperatureSymbol()" />
                 }
             </div>
         </div>
@@ -83,13 +92,24 @@ else
 }
 
 @code {
+    private bool isFahrenheit = true;
     private Result<DashboardDto>? dashboard;
-    private string zip = "47546";
+    private string zip = "46201";
     private string countryCode = "US";
 
     private List<CountryOption> countries = new();
     private string? validationError;
     private string? authMessage;
+
+    private string GetTemperatureUnit()
+    {
+        return isFahrenheit ? "fahrenheit" : "celsius";
+    }
+
+    private string GetTemperatureSymbol()
+    {
+        return isFahrenheit ? "F" : "C";
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -97,6 +117,7 @@ else
             ?? new List<CountryOption>();
 
         await LoadSavedPreferences();
+        await LoadDashboard();
     }
 
     private async Task LoadSavedPreferences()
@@ -119,6 +140,7 @@ else
             {
                 zip = prefs.Zip;
                 countryCode = prefs.CountryCode;
+                isFahrenheit = string.Equals(prefs.TemperatureUnit,"fahrenheit", StringComparison.OrdinalIgnoreCase);
             }
         }
         catch
@@ -131,9 +153,10 @@ else
     {
         if (!IsValidInput())
             return;
+        var temperatureUnit = GetTemperatureUnit();
 
         dashboard = await ApiClient.Http.GetFromJsonAsync<Result<DashboardDto>>(
-            $"/?zip={Uri.EscapeDataString(zip)}&countryCode={Uri.EscapeDataString(countryCode)}");
+            $"/?zip={Uri.EscapeDataString(zip)}&countryCode={Uri.EscapeDataString(countryCode)}&temperatureUnit={Uri.EscapeDataString(temperatureUnit)}");
 
         await SavePreferences();
     }
@@ -145,7 +168,8 @@ else
             var request = new UpdatePreferencesRequest
             {
                 Zip = zip,
-                CountryCode = countryCode
+                CountryCode = countryCode,
+                TemperatureUnit = GetTemperatureUnit()
             };
 
             await ApiClient.Http.PutAsJsonAsync("/preferences", request);
@@ -186,11 +210,13 @@ else
     {
         public string Zip { get; set; } = "";
         public string CountryCode { get; set; } = "US";
+        public string TemperatureUnit { get; set; } = "fahrenheit";
     }
 
     public class UpdatePreferencesRequest
     {
         public string Zip { get; set; } = "";
         public string CountryCode { get; set; } = "US";
+        public string TemperatureUnit { get; set; } = "fahrenheit";
     }
 }

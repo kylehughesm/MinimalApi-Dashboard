@@ -4,5 +4,5 @@ namespace Weather.Infrastructure;
 
 public interface IWeatherClient
 {
-    public Task<WeatherResponse?> GetWeather(double latitude, double longitude);
+    public Task<WeatherResponse?> GetWeather(double latitude, double longitude, string temperatureUnit);
 }

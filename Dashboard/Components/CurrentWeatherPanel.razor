@@ -4,7 +4,7 @@
 {
     <div class="current-weather-panel">
         <h2>@LocationName</h2>
-        <div class="current-temp">@Math.Round(Current.Temp)°F</div>
+        <div class="current-temp">@Math.Round(Current.Temp)@TemperatureSymbol</div>
         <div class="current-description">@Current.Description</div>
         <div class="current-precip">Precipitation: @Current.PrecipitationSum</div>
         <div class="current-time">Updated: @Current.Time.ToString("MMM d, h:mm tt")</div>
@@ -14,4 +14,5 @@
 @code {
     [Parameter] public string LocationName { get; set; } = "";
     [Parameter] public CurrentWeatherDto? Current { get; set; }
+    [Parameter] public string TemperatureSymbol { get; set; } = "F";
 }

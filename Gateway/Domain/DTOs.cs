@@ -70,4 +70,4 @@ public class NewsArticleDto
     public DateTime PublishedAt { get; set; }
 }
 
-public record UpdatePreferencesRequest(string Zip, string CountryCode);
+public record UpdatePreferencesRequest(string Zip, string CountryCode, string TemperatureUnit);

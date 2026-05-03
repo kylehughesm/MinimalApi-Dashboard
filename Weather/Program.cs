@@ -9,9 +9,9 @@ builder.Services.AddScoped<IWeatherService, WeatherService>();
 
 var app = builder.Build();
 
-app.MapGet("/", async (string zip, string countryCode, IWeatherService service) =>
+app.MapGet("/", async (string zip, string countryCode, string temperatureUnit, IWeatherService service) =>
 {
-    var result = await service.Get(zip, countryCode);
+    var result = await service.Get(zip, countryCode, temperatureUnit);
 
     if (!result.Success || result.Value is null)
         return Results.BadRequest(result);

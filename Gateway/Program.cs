@@ -64,8 +64,8 @@ app.MapPost("/logout", async (HttpContext context) =>
 .WithTags("Identity")
 .RequireAuthorization(cookieAuth);
 
-app.MapGet("/", async (string zip, string countryCode, IGatewayService service) =>
-    await service.Get(zip, countryCode));
+app.MapGet("/", async (string zip, string countryCode, string temperatureUnit, IGatewayService service) =>
+    await service.Get(zip, countryCode, temperatureUnit));
 
 app.MapGet("/me", (ClaimsPrincipal user) =>
 {
@@ -96,7 +96,8 @@ app.MapGet("/preferences", async (ClaimsPrincipal user, ApplicationDbContext db)
     return Results.Ok(new
     {
         zip = prefs.Zip,
-        countryCode = prefs.CountryCode
+        countryCode = prefs.CountryCode,
+        temperatureUnit =prefs.TemperatureUnit
     });
 }).RequireAuthorization(cookieAuth);
 
@@ -119,7 +120,8 @@ app.MapPut("/preferences", async (
         {
             UserId = userId,
             Zip = request.Zip,
-            CountryCode = request.CountryCode
+            CountryCode = request.CountryCode,
+            TemperatureUnit = request.TemperatureUnit
         };
 
         db.UserPreferences.Add(prefs);
@@ -128,6 +130,7 @@ app.MapPut("/preferences", async (
     {
         prefs.Zip = request.Zip;
         prefs.CountryCode = request.CountryCode;
+        prefs.TemperatureUnit = request.TemperatureUnit;
     }
 
     await db.SaveChangesAsync();
@@ -135,7 +138,8 @@ app.MapPut("/preferences", async (
     return Results.Ok(new
     {
         zip = prefs.Zip,
-        countryCode = prefs.CountryCode
+        countryCode = prefs.CountryCode,
+        temperatureUnit = prefs.TemperatureUnit
     });
 }).RequireAuthorization(cookieAuth);
 

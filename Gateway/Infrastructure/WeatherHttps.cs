@@ -12,12 +12,12 @@ public class WeatherService: IWeatherService
         _httpClient = httpClient;
     }
 
-    public async Task<Result<WeatherDto>> GetWeather(string zip, string countryCode)
+    public async Task<Result<WeatherDto>> GetWeather(string zip, string countryCode, string temperatureUnit)
     {
         try
         {
             var response = await _httpClient.GetAsync(
-                $"?zip={Uri.EscapeDataString(zip)}&countryCode={Uri.EscapeDataString(countryCode)}");
+                $"?zip={Uri.EscapeDataString(zip)}&countryCode={Uri.EscapeDataString(countryCode)}&temperatureUnit={Uri.EscapeDataString(temperatureUnit)}");
 
             var result = await response.Content.ReadFromJsonAsync<Result<WeatherDto>>();
 

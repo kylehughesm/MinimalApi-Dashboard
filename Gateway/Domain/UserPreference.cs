@@ -9,4 +9,5 @@ public class UserPreference
 
     public string Zip { get; set; } = string.Empty;
     public string CountryCode { get; set; } = "US";
+    public string TemperatureUnit { get; set; } = "Fahrenheit";
 }

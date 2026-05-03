@@ -4,7 +4,7 @@ namespace Gateway.Infrastructure;
 
 public interface IWeatherService
 {
-    public Task<Result<WeatherDto>> GetWeather(string zip, string countryCode);
+    public Task<Result<WeatherDto>> GetWeather(string zip, string countryCode, string temperatureUnit);
 }
 
 public interface INewsService
